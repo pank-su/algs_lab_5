@@ -68,7 +68,7 @@ private fun Array<*>.inputIndex(query: String, min: Int = 0, max: Int = size): I
 private fun Array<Int>.interactiveAdd(): Array<Int> {
     val i = inputIndex("Введите индекс (от 0 до $size) куда вы хотите добавить новый элемент")
     var num: Int? = null
-    while (num == null){
+    while (num == null) {
         println("Введите значение элемента")
         num = readln().toIntOrNull() ?: continue
     }
@@ -108,12 +108,19 @@ data class SortedArray(val array: Array<Int>, val swaps: Int, val compares: Int)
  */
 fun Array<Int>.shakeSort(): SortedArray {
     val array = this.copyOf()
+
+    // Количество перестановок и сравнений
     var swaps = 0
     var compares = 0
 
+    // Левая и правая граница
     var left = 0
     var right = size - 1
-    while (left < right) {
+    do {
+        var isSwapped = false // Есть ли перестановки
+        var swappedIndex = left
+
+        // Слева направо
         for (i in left..<right) {
             compares++
             if (array[i] > array[i + 1]) {
@@ -121,9 +128,15 @@ fun Array<Int>.shakeSort(): SortedArray {
                 array[i + 1] = array[i]
                 array[i] = temp
                 swaps++
+                swappedIndex = i
+                isSwapped = true
             }
         }
-        right--
+        if (!isSwapped) break // Если список уже отсортирован, то в нём нет перестановок
+
+        right = swappedIndex
+
+        // Справа налево
         for (i in right downTo left + 1) {
             compares++
             if (array[i] < array[i - 1]) {
@@ -131,9 +144,11 @@ fun Array<Int>.shakeSort(): SortedArray {
                 array[i - 1] = array[i]
                 array[i] = temp
                 swaps++
+                swappedIndex = i
+                isSwapped = true
             }
         }
-        left++
-    }
+        left = swappedIndex
+    } while (isSwapped)
     return SortedArray(array, swaps, compares)
 }
