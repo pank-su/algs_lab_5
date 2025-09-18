@@ -1,5 +1,6 @@
 import kotlin.random.Random
 
+
 fun main() {
     var n: Int? = null
     while (n == null) {
@@ -28,20 +29,79 @@ fun main() {
         }
         -1 // WTF compiler
     }
-    print("Неотсортированный массив: ")
-    println(array.joinToString(", "))
-    val sorted = array.shakeSort()
-    print("Отсортированный массив: ")
+    while (true) {
+        print("Неотсортированный массив: ")
+        println(array.joinToString(", "))
+        val sorted = array.shakeSort()
+        print("Отсортированный массив: ")
 
-    println(sorted.array.joinToString(", "))
-    println("Количество сравнений: ${sorted.compares}")
-    println("Количество перестановок: ${sorted.swaps}")
-    println("Что вы хотите сделать?")
+        println(sorted.array.joinToString(", "))
+        println("Количество сравнений: ${sorted.compares}")
+        println("Количество перестановок: ${sorted.swaps}")
+        println("Что вы хотите сделать?")
+        println("1. Добавить элемент")
+        println("2. Удалить элемент")
+        println("3. Найти элемент по его позиции")
+        println("4. Выйти")
 
+        val variant = readln().toIntOrNull()
+        when (variant) {
+            1 -> array = array.interactiveAdd()
+            2 -> array = array.interactiveRemove()
+            3 -> sorted.interactiveFindByPosition()
+            4 -> break
+        }
+    }
 }
 
 
-data class SortedArray(val array: Array<Int>, val swaps: Int, val compares: Int)
+private fun Array<*>.inputIndex(query: String, min: Int = 0, max: Int = size): Int {
+    var i = -1
+
+    while (i !in min..max) {
+        println(query)
+        i = readln().toIntOrNull() ?: continue
+    }
+    return i
+}
+
+private fun Array<Int>.interactiveAdd(): Array<Int> {
+    val i = inputIndex("Введите индекс (от 0 до $size) куда вы хотите добавить новый элемент")
+    var num: Int? = null
+    while (num == null){
+        println("Введите значение элемента")
+        num = readln().toIntOrNull() ?: continue
+    }
+    return this.sliceArray(0..<i) + num + this.sliceArray(i..<size)
+
+}
+
+private fun Array<Int>.interactiveRemove(): Array<Int> {
+    val i = inputIndex("Введите индекс элемента (от 0 до $size), который вы хотите удалить")
+    return this.sliceArray(0..<i) + this.sliceArray(i + 1..<size)
+}
+
+private fun SortedArray.interactiveFindByPosition() {
+    val i = array.inputIndex("Введите число по порядку (от 1 до ${array.size})", 1, array.size)
+    println("Число по порядку $i: ${findByPosition(i)}")
+}
+
+/**
+ * Класс возвращающий отсортированный массив
+ *
+ * @param array отсортированный массив
+ * @param swaps количество перестановок
+ * @param compares количество сравнений
+ */
+data class SortedArray(val array: Array<Int>, val swaps: Int, val compares: Int) {
+
+    /**
+     * Поиск k-го по порядку числа
+     */
+    fun findByPosition(k: Int): Int {
+        return array[k - 1]
+    }
+}
 
 /**
  * Шейкерная сортировка
@@ -64,9 +124,9 @@ fun Array<Int>.shakeSort(): SortedArray {
             }
         }
         right--
-        for (i in right downTo left + 1){
+        for (i in right downTo left + 1) {
             compares++
-            if (array[i] < array[i - 1]){
+            if (array[i] < array[i - 1]) {
                 val temp = array[i - 1]
                 array[i - 1] = array[i]
                 array[i] = temp
